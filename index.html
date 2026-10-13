@@ -1,273 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Servo Pricing Portal</title>
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
     :root {
-      --primary: #d9381e;
-      --primary-dark: #b32a13;
-      --secondary: #1a202c;
-      --bg: #f8fafc;
+      --primary: #003366;
+      --primary-light: #00509e;
+      --accent: #ff6600;
+      --bg: #f4f6f9;
       --card-bg: #ffffff;
-      --border: #e2e8f0;
       --text: #2d3748;
       --text-muted: #718096;
-      --success: #22c55e;
+      --border: #e2e8f0;
+      --highlight-bg: #fff5f0;
+      --highlight-border: #ffccb3;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
-      min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      padding: 24px 16px;
+      min-height: 100vh;
     }
 
-    /* Top Bar */
-    .top-bar {
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
+    .container {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .header-card {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: #fff;
+      padding: 20px 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0, 51, 102, 0.18);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .date-display {
-      font-weight: 600;
-      color: var(--secondary);
-      font-size: 0.95rem;
+    .header-card h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
     }
 
-    .top-actions {
+    .status-badge {
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .status-badge .label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      opacity: 0.85;
+    }
+
+    .status-badge .value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Main Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .search-group {
+      position: relative;
+    }
+
+    .search-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .search-label {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    .item-count-badge {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #edf2f7;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
       align-items: center;
     }
 
-    .btn-action {
-      background: #edf2f7;
-      color: var(--secondary);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    .btn-action:hover {
-      background: #e2e8f0;
-    }
-
-    /* Container */
-    .container {
-      max-width: 650px;
+    .input-wrapper input {
       width: 100%;
-      margin: 30px auto;
-      padding: 0 16px;
-      flex: 1;
-    }
-
-    .title-section {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .brand-title {
-      color: var(--primary);
-      font-size: 1.8rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-
-    .sync-badge {
-      display: inline-block;
-      margin-top: 6px;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      background: #edf2f7;
-      color: var(--text-muted);
-    }
-
-    /* Search Box */
-    .search-wrapper {
-      position: relative;
-      margin-bottom: 24px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 14px 44px 14px 16px;
-      font-size: 1rem;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      background: var(--card-bg);
+      padding: 12px 42px 12px 14px;
+      font-size: 0.95rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(217, 56, 30, 0.15);
+    .input-wrapper input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(0, 80, 158, 0.12);
     }
 
     .clear-btn {
       position: absolute;
       right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
       background: #e2e8f0;
+      color: #4a5568;
       border: none;
-      width: 24px;
-      height: 24px;
       border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
       display: none;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-weight: bold;
-      font-size: 0.8rem;
     }
 
     .clear-btn:hover {
       background: #cbd5e0;
-      color: var(--secondary);
+      color: #1a202c;
     }
 
-    /* Autocomplete Suggestions */
     .suggestions {
       position: absolute;
       top: 100%;
       left: 0;
       right: 0;
-      background: var(--card-bg);
+      background: #fff;
       border: 1px solid var(--border);
       border-top: none;
-      border-radius: 0 0 10px 10px;
-      max-height: 260px;
+      border-radius: 0 0 8px 8px;
+      max-height: 240px;
       overflow-y: auto;
       z-index: 50;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
       display: none;
     }
 
     .suggestion-item {
-      padding: 12px 16px;
+      padding: 10px 14px;
       cursor: pointer;
-      border-bottom: 1px solid #edf2f7;
-      font-size: 0.95rem;
-    }
-
-    .suggestion-item:last-child {
-      border-bottom: none;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #f7fafc;
     }
 
     .suggestion-item:hover {
-      background-color: #fff5f5;
+      background-color: #ebf8ff;
       color: var(--primary);
     }
 
-    /* Result Card */
-    .result-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    .admin-actions {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .admin-btn {
+      background: none;
+      border: none;
+      color: var(--primary-light);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .admin-btn:hover {
+      color: var(--primary);
+    }
+
+    /* Results Card */
+    .results-card {
       display: none;
     }
 
-    .product-heading {
-      font-size: 1.25rem;
+    .product-title {
+      font-size: 1.15rem;
       font-weight: 700;
-      color: var(--secondary);
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-    }
-
-    /* Eff DLP Highlight Box */
-    .eff-dlp-banner {
-      background: #fff5f5;
-      border: 1px solid #fed7d7;
-      border-radius: 8px;
-      padding: 18px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .eff-dlp-label {
-      font-size: 0.85rem;
       color: var(--primary);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid var(--border);
+      line-height: 1.4;
+    }
+
+    /* Highlighted Eff DLP Section */
+    .highlight-eff-dlp {
+      background: var(--highlight-bg);
+      border: 2px solid var(--highlight-border);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .highlight-eff-dlp .highlight-label {
+      font-size: 0.85rem;
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      color: var(--accent);
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
     }
 
-    .eff-dlp-val {
+    .highlight-eff-dlp .highlight-val {
       font-size: 2.2rem;
       font-weight: 800;
-      color: var(--primary-dark);
-      margin-top: 4px;
+      color: #b84300;
     }
 
-    /* Price Breakdown Grid */
+    /* Price Grid for MRP, DLP, HO Disc */
     .price-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
 
-    .price-tile {
+    .price-item {
       background: #f8fafc;
-      padding: 12px;
+      padding: 12px 14px;
       border-radius: 8px;
       border: 1px solid var(--border);
       text-align: center;
     }
 
-    .tile-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
+    .price-item .item-label {
+      font-size: 0.74rem;
       text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
 
-    .tile-value {
+    .price-item .item-val {
       font-size: 1.15rem;
       font-weight: 700;
-      color: var(--secondary);
+      color: var(--text);
     }
 
-    /* Footer */
-    footer {
-      background: var(--card-bg);
-      border-top: 1px solid var(--border);
-      padding: 16px;
+    /* Statutory Footer Notice */
+    .footer-note {
       text-align: center;
       font-size: 0.85rem;
-      color: #e53e3e;
-      font-weight: 600;
+      font-weight: 500;
+      color: #991b1b;
+      background-color: #fef2f2;
+      border: 1px dashed #f87171;
+      padding: 10px 14px;
+      border-radius: 8px;
     }
 
-    /* Modals */
+    /* Admin Confirmation Modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -286,41 +316,38 @@
       width: 100%;
       padding: 24px;
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      text-align: center;
     }
 
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: var(--secondary);
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--text);
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      outline: none;
-      font-size: 0.9rem;
-    }
-
-    .btn-group {
+    .confirm-icon {
+      width: 56px;
+      height: 56px;
+      background: #dcfce7;
+      color: #16a34a;
+      border-radius: 50%;
       display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 14px auto;
+    }
+
+    .confirm-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #15803d;
+      margin-bottom: 8px;
+    }
+
+    .confirm-details {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.88rem;
+      text-align: left;
+      margin: 14px 0;
+      line-height: 1.6;
     }
 
     .btn-submit {
@@ -331,440 +358,386 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-    }
-
-    .btn-cancel {
-      background: #edf2f7;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* Confirmation Modal */
-    .confirm-card {
-      text-align: center;
-      padding: 10px;
-    }
-
-    .confirm-icon {
-      width: 60px;
-      height: 60px;
-      background: #dcfce7;
-      color: #16a34a;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      margin: 0 auto 16px auto;
-    }
-
-    .confirm-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: #15803d;
-      margin-bottom: 8px;
-    }
-
-    .confirm-details {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      font-size: 0.9rem;
-      text-align: left;
-      margin: 16px 0;
-      line-height: 1.6;
+      width: 100%;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <div class="date-display" id="dateDisplay"></div>
-    <div class="top-actions">
-      <button class="btn-action" onclick="fetchPriceData(true)">↻ Refresh</button>
-      <button class="btn-action" onclick="openAdminModal()">Admin Login</button>
+<div class="container">
+
+  <!-- Header Section -->
+  <div class="header-card">
+    <h1>Servo Pricing Portal</h1>
+    <div class="status-badge">
+      <span class="label">Current Date</span>
+      <span class="value" id="currentDateDisplay">--</span>
     </div>
   </div>
 
-  <!-- Content Container -->
-  <div class="container">
-    <div class="title-section">
-      <h1 class="brand-title">SERVO PRICING PORTAL</h1>
-      <div class="sync-badge" id="syncStatus">Checking for circular...</div>
-    </div>
-
-    <!-- Product Search Box -->
-    <div class="search-wrapper">
-      <input
-        type="text"
-        class="search-input"
-        id="productSearch"
-        placeholder="Type product name to search..."
-        autocomplete="off"
-        oninput="handleSearchInput()"
-      />
-      <button class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Clear">✕</button>
+  <!-- Search Card -->
+  <div class="card">
+    <div class="search-group">
+      <div class="search-header">
+        <label class="search-label" for="productInput">Enter Product Name:</label>
+        <span class="item-count-badge" id="productCountBadge">Loading circular...</span>
+      </div>
+      <div class="input-wrapper">
+        <input type="text" id="productInput" placeholder="Type SERVO product name..." autocomplete="off">
+        <button type="button" class="clear-btn" id="clearBtn" title="Clear input">✕</button>
+      </div>
       <div class="suggestions" id="suggestionsBox"></div>
     </div>
 
-    <!-- Pricing Card -->
-    <div class="result-card" id="resultCard">
-      <div class="product-heading" id="cardProductName">-</div>
+    <div class="admin-actions">
+      <span>🔒 Admin Control:</span>
+      <button type="button" class="admin-btn" id="authPriceUploadBtn">Update Price Circular (.xlsx)</button>
+      <input type="file" id="excelFileInput" accept=".xlsx, .xls" style="display: none;">
+    </div>
+  </div>
 
-      <!-- Eff DLP Display -->
-      <div class="eff-dlp-banner">
-        <div class="eff-dlp-label">Effective DLP (Eff DLP)</div>
-        <div class="eff-dlp-val" id="cardEffDlp">₹0.00</div>
+  <!-- Pricing Details Result Card -->
+  <div class="card results-card" id="resultsCard">
+    <div class="product-title" id="outProductName">Product Name</div>
+    
+    <!-- Primary Highlighted Figure: Eff DLP -->
+    <div class="highlight-eff-dlp">
+      <div class="highlight-label">Effective DLP (Eff DLP)</div>
+      <div class="highlight-val" id="outEffDLP">₹ 0.00</div>
+    </div>
+
+    <!-- Additional Details: MRP, DLP, HO Discount -->
+    <div class="price-grid">
+      <div class="price-item">
+        <div class="item-label">MRP</div>
+        <div class="item-val" id="outMRP">₹ 0.00</div>
       </div>
-
-      <!-- Price Breakdown Grid -->
-      <div class="price-grid">
-        <div class="price-tile">
-          <div class="tile-label">MRP</div>
-          <div class="tile-value" id="cardMrp">₹0.00</div>
-        </div>
-        <div class="price-tile">
-          <div class="tile-label">DLP</div>
-          <div class="tile-value" id="cardDlp">₹0.00</div>
-        </div>
-        <div class="price-tile">
-          <div class="tile-label">HO Discount</div>
-          <div class="tile-value" id="cardHoDisc">₹0.00</div>
-        </div>
+      <div class="price-item">
+        <div class="item-label">DLP</div>
+        <div class="item-val" id="outDLP">₹ 0.00</div>
+      </div>
+      <div class="price-item">
+        <div class="item-label">HO Discount</div>
+        <div class="item-val" id="outHODisc">₹ 0.00</div>
       </div>
     </div>
   </div>
 
-  <!-- Statutory Footnote -->
-  <footer>
+  <!-- Mandatory Statutory Disclaimer -->
+  <div class="footer-note">
     User to verify the prices from circular.
-  </footer>
-
-  <!-- Admin Modal -->
-  <div class="modal-backdrop" id="adminModal">
-    <div class="modal-box">
-      <div id="authSection">
-        <h2 class="modal-title">Admin Authentication</h2>
-        <div class="form-group">
-          <label class="form-label">Enter Passcode</label>
-          <input type="password" id="passcode" class="form-input" placeholder="Passcode" />
-        </div>
-        <div class="btn-group">
-          <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
-          <button class="btn-submit" onclick="verifyPasscode()">Verify</button>
-        </div>
-      </div>
-
-      <!-- Only Price Circular File Upload is shown -->
-      <div id="uploadSection" style="display:none;">
-        <h2 class="modal-title">Upload Price Circular</h2>
-        
-        <div class="form-group">
-          <label class="form-label">Select Price Circular (.xlsx)</label>
-          <input type="file" id="circularFile" accept=".xlsx, .xls" class="form-input" />
-        </div>
-
-        <div id="uploadProgress" style="display:none; font-size: 0.9rem; font-weight: 600; color: #3182ce; margin-bottom: 10px;">
-          Uploading and updating all devices...
-        </div>
-
-        <div class="btn-group">
-          <button class="btn-cancel" onclick="closeAdminModal()">Close</button>
-          <button class="btn-submit" id="pushBtn" onclick="processAndPushCircular()">Upload Circular</button>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <!-- Admin Upload Confirmation Modal -->
-  <div class="modal-backdrop" id="confirmModal">
-    <div class="modal-box confirm-card">
-      <div class="confirm-icon">✓</div>
-      <h2 class="confirm-title">Price Circular Uploaded!</h2>
-      <p style="color: #4a5568; font-size: 0.95rem;">Changes are now live across all user devices.</p>
-      
-      <div class="confirm-details" id="confirmSummary"></div>
+</div>
 
-      <button class="btn-submit" style="width: 100%;" onclick="closeConfirmModal()">Done</button>
-    </div>
+<!-- Admin Confirmation Modal -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal-box">
+    <div class="confirm-icon">✓</div>
+    <h2 class="confirm-title">Price Circular Uploaded!</h2>
+    <p style="color: #4a5568; font-size: 0.9rem;">Prices have been synced across all user devices.</p>
+    <div class="confirm-details" id="confirmSummary"></div>
+    <button class="btn-submit" onclick="closeConfirmModal()">Done</button>
   </div>
+</div>
 
-  <script>
-    // Hardcoded GitHub Repository Settings
-    const GH_OWNER = "Binaykrishna";
-    const GH_REPO = "Servo-DLP";
-    const REPO_PATH = `${GH_OWNER}/${GH_REPO}`;
+<script>
+  // ==========================================
+  // CONFIGURATION: GITHUB REPO & STORAGE
+  // ==========================================
+  const GITHUB_REPO_OWNER = "binaykrishna";
+  const GITHUB_REPO_NAME = "Servo-DLP";
+  const SHARED_STORAGE_API = "https://api.npoint.io/469c8bf832a2f8d09ca0";
+  const LOCAL_CIRCULAR_FILE = "circular_data.json";
 
-    // Place your GitHub Personal Access Token (PAT) here if you want it preconfigured,
-    // or run `localStorage.setItem('servo_admin_token', 'your_token')` in the admin console.
-    const ADMIN_GH_TOKEN = localStorage.getItem('servo_admin_token') || "";
+  let lubeData = [];
 
-    let priceData = [];
+  // --- IndexedDB Fallback ---
+  const DB_NAME = "ServoPricingStorage";
+  const DB_VERSION = 1;
+  let dbInstance = null;
 
-    // Current Date
-    function updateDate() {
-      const today = new Date();
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-IN', options);
-    }
-    updateDate();
-
-    // Cache-free live data retrieval
-    async function fetchPriceData(manualTrigger = false) {
-      const syncStatus = document.getElementById('syncStatus');
-      syncStatus.textContent = "Loading prices...";
-      syncStatus.style.background = "#edf2f7";
-      syncStatus.style.color = "#718096";
-
-      const urlsToTry = [
-        `https://raw.githubusercontent.com/${REPO_PATH}/main/data.json?cache_bypass=${Date.now()}`,
-        `data.json?cache_bypass=${Date.now()}`
-      ];
-
-      for (const url of urlsToTry) {
-        try {
-          const res = await fetch(url, { cache: "no-store" });
-          if (res.ok) {
-            const parsed = await res.json();
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              priceData = parsed;
-              const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-              syncStatus.textContent = `● Active Circular: ${priceData.length} SKUs (Updated: ${timestamp})`;
-              syncStatus.style.background = "#dcfce7";
-              syncStatus.style.color = "#15803d";
-              if (manualTrigger) alert(`Circular updated! Loaded ${priceData.length} products.`);
-              return;
-            }
-          }
-        } catch (e) {}
-      }
-
-      syncStatus.textContent = "No circular uploaded yet. Admin can upload via Admin Login.";
-      syncStatus.style.background = "#fee2e2";
-      syncStatus.style.color = "#991b1b";
-    }
-
-    fetchPriceData();
-
-    // Autocomplete Search
-    function handleSearchInput() {
-      const input = document.getElementById('productSearch');
-      const clearBtn = document.getElementById('clearBtn');
-      const val = input.value.trim().toLowerCase();
-      const suggestions = document.getElementById('suggestionsBox');
-
-      clearBtn.style.display = val ? 'flex' : 'none';
-
-      if (!val) {
-        suggestions.style.display = 'none';
-        return;
-      }
-
-      const matches = priceData.filter(item => 
-        item.name && item.name.toLowerCase().includes(val)
-      ).slice(0, 15);
-
-      if (matches.length === 0) {
-        suggestions.innerHTML = '<div class="suggestion-item" style="color:#a0aec0;cursor:default;">No matching product found</div>';
-      } else {
-        suggestions.innerHTML = matches.map(m => 
-          `<div class="suggestion-item" onclick="selectProduct('${encodeURIComponent(JSON.stringify(m))}')">${m.name}</div>`
-        ).join('');
-      }
-      suggestions.style.display = 'block';
-    }
-
-    function clearSearch() {
-      document.getElementById('productSearch').value = '';
-      document.getElementById('clearBtn').style.display = 'none';
-      document.getElementById('suggestionsBox').style.display = 'none';
-      document.getElementById('resultCard').style.display = 'none';
-    }
-
-    function selectProduct(encodedItem) {
-      const item = JSON.parse(decodeURIComponent(encodedItem));
-      document.getElementById('productSearch').value = item.name;
-      document.getElementById('suggestionsBox').style.display = 'none';
-      document.getElementById('clearBtn').style.display = 'flex';
-
-      document.getElementById('cardProductName').textContent = item.name;
-      document.getElementById('cardEffDlp').textContent = formatCurrency(item.effDlp);
-      document.getElementById('cardMrp').textContent = formatCurrency(item.mrp);
-      document.getElementById('cardDlp').textContent = formatCurrency(item.dlp);
-      document.getElementById('cardHoDisc').textContent = formatCurrency(item.hoDisc);
-
-      document.getElementById('resultCard').style.display = 'block';
-    }
-
-    function formatCurrency(val) {
-      const num = parseFloat(val);
-      return isNaN(num) ? "₹0.00" : `₹${num.toFixed(2)}`;
-    }
-
-    // Modal controls
-    function openAdminModal() {
-      document.getElementById('adminModal').style.display = 'flex';
-      document.getElementById('authSection').style.display = 'block';
-      document.getElementById('uploadSection').style.display = 'none';
-      document.getElementById('passcode').value = '';
-    }
-
-    function closeAdminModal() {
-      document.getElementById('adminModal').style.display = 'none';
-    }
-
-    function verifyPasscode() {
-      const code = document.getElementById('passcode').value.trim();
-      if (code === '011100') {
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('uploadSection').style.display = 'block';
-      } else {
-        alert('Incorrect Passcode');
-      }
-    }
-
-    function closeConfirmModal() {
-      document.getElementById('confirmModal').style.display = 'none';
-    }
-
-    // Process & Commit XLSX
-    async function processAndPushCircular() {
-      const fileInput = document.getElementById('circularFile');
-      const progress = document.getElementById('uploadProgress');
-      const pushBtn = document.getElementById('pushBtn');
-
-      if (!fileInput.files.length) {
-        alert('Please choose an Excel (.xlsx) file.');
-        return;
-      }
-
-      let token = ADMIN_GH_TOKEN;
-      if (!token) {
-        token = prompt("Please provide GitHub Personal Access Token (saved in your device for future uploads):");
-        if (!token) return;
-        localStorage.setItem('servo_admin_token', token.trim());
-      }
-
-      progress.style.display = 'block';
-      progress.style.color = '#3182ce';
-      progress.textContent = 'Parsing Excel sheet...';
-      pushBtn.disabled = true;
-
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.onload = async function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
-
-          // Columns: Col E (index 4) DLP, Col F (index 5) MRP, Col H (index 7) HO Disc, Col I (index 8) Eff DLP
-          const parsed = [];
-          for (let i = 1; i < rows.length; i++) {
-            const r = rows[i];
-            const name = (r[1] || r[2] || r[0] || "").toString().trim();
-            const dlp = parseFloat(r[4]) || 0;
-            const mrp = parseFloat(r[5]) || 0;
-            const hoDisc = parseFloat(r[7]) || 0;
-            const effDlp = parseFloat(r[8]) || 0;
-
-            if (name && (effDlp > 0 || mrp > 0 || dlp > 0)) {
-              parsed.push({ name, dlp, mrp, hoDisc, effDlp });
-            }
-          }
-
-          if (parsed.length === 0) {
-            throw new Error("No valid product records found in columns E, F, H, I.");
-          }
-
-          progress.textContent = 'Pushing update to GitHub...';
-
-          const commitRes = await commitToGitHub(REPO_PATH, token, parsed);
-
-          priceData = parsed;
-          closeAdminModal();
-          progress.style.display = 'none';
-          pushBtn.disabled = false;
-
-          showAdminConfirmation(file.name, parsed.length, commitRes.sha);
-          fetchPriceData();
-
-        } catch (err) {
-          progress.style.color = '#e53e3e';
-          progress.textContent = 'Error: ' + err.message;
-          pushBtn.disabled = false;
+  function initDB() {
+    return new Promise((resolve) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      request.onupgradeneeded = function(e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains("circulars")) {
+          db.createObjectStore("circulars");
         }
       };
+      request.onsuccess = function(e) {
+        dbInstance = e.target.result;
+        resolve(dbInstance);
+      };
+      request.onerror = function() {
+        resolve(null);
+      };
+    });
+  }
 
-      reader.readAsArrayBuffer(file);
-    }
-
-    async function commitToGitHub(repo, token, contentObject) {
-      const path = 'data.json';
-      const url = `https://api.github.com/repos/${repo}/contents/${path}`;
-      
-      let sha = '';
+  function saveToDB(key, val) {
+    return new Promise((resolve) => {
+      if (!dbInstance) return resolve();
       try {
-        const getRes = await fetch(url, {
-          headers: { 
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
-        if (getRes.ok) {
-          const fileInfo = await getRes.json();
-          sha = fileInfo.sha;
-        }
-      } catch (e) {}
-
-      const jsonStr = JSON.stringify(contentObject, null, 2);
-      const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
-
-      const body = {
-        message: `Admin circular update: ${new Date().toISOString()}`,
-        content: encodedContent
-      };
-      if (sha) body.sha = sha;
-
-      const putRes = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!putRes.ok) {
-        const errObj = await putRes.json();
-        throw new Error(errObj.message || 'GitHub commit failed');
+        const tx = dbInstance.transaction("circulars", "readwrite");
+        const store = tx.objectStore("circulars");
+        store.put(val, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (err) {
+        resolve();
       }
+    });
+  }
 
-      return await putRes.json();
+  function getFromDB(key) {
+    return new Promise((resolve) => {
+      if (!dbInstance) return resolve(null);
+      try {
+        const tx = dbInstance.transaction("circulars", "readonly");
+        const store = tx.objectStore("circulars");
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      } catch (err) {
+        resolve(null);
+      }
+    });
+  }
+
+  // --- Fetch Circular for All Devices ---
+  async function loadCentralCircular() {
+    const badge = document.getElementById('productCountBadge');
+
+    // 1. Direct shared cloud sync (zero-delay across devices)
+    try {
+      const res = await fetch(`${SHARED_STORAGE_API}?nocache=${Date.now()}`, { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          lubeData = data;
+          saveToDB("saved_lube_data", lubeData);
+          badge.textContent = `${lubeData.length} Products Loaded (Live Sync)`;
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Repository JSON fallback
+    try {
+      const localRes = await fetch(`./${LOCAL_CIRCULAR_FILE}?nocache=${Date.now()}`);
+      if (localRes.ok) {
+        const localData = await localRes.json();
+        if (Array.isArray(localData) && localData.length > 0) {
+          lubeData = localData;
+          saveToDB("saved_lube_data", lubeData);
+          badge.textContent = `${lubeData.length} Products Loaded (Repository)`;
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Local offline cache fallback
+    try {
+      await initDB();
+      const saved = await getFromDB("saved_lube_data");
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        lubeData = saved;
+        badge.textContent = `${lubeData.length} Products Loaded (Cached)`;
+        return;
+      }
+    } catch (e) {}
+
+    badge.textContent = "Upload Price Circular";
+  }
+
+  // --- Date Initialization ---
+  function updateDate() {
+    const today = new Date();
+    const day = today.getDate();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    document.getElementById('currentDateDisplay').textContent = `${String(day).padStart(2, '0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
+  }
+  updateDate();
+
+  // --- Excel Parser ---
+  // DLP: Col E (idx 4), MRP: Col F (idx 5), HO Disc: Col H (idx 7), Eff DLP: Col I (idx 8)
+  function parseExcelBuffer(buffer) {
+    try {
+      const wb = XLSX.read(buffer, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const loaded = [];
+
+      for (let i = 1; i < rawRows.length; i++) {
+        const r = rawRows[i];
+        if (!r || r.length === 0) continue;
+
+        const name = (r[2] || r[1] || r[0] || "").toString().trim();
+        const dlp = parseFloat(r[4]) || 0;
+        const mrp = parseFloat(r[5]) || 0;
+        const hoDisc = parseFloat(r[7]) || 0;
+        const effDlp = parseFloat(r[8]) || 0;
+
+        if (name && (effDlp > 0 || mrp > 0 || dlp > 0)) {
+          loaded.push({
+            name,
+            dlp,
+            mrp,
+            hoDisc,
+            effDlp
+          });
+        }
+      }
+      return loaded;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }
+
+  // --- Admin Passcode & Upload ---
+  const AUTH_KEY = "011100";
+  const authPriceUploadBtn = document.getElementById('authPriceUploadBtn');
+  const excelFileInput = document.getElementById('excelFileInput');
+
+  authPriceUploadBtn.addEventListener('click', () => {
+    const entered = prompt("Enter Administrator Passcode:");
+    if (entered === null) return;
+    if (entered.trim() === AUTH_KEY) {
+      excelFileInput.click();
+    } else {
+      alert("Access Denied: Invalid Passcode.");
+    }
+  });
+
+  excelFileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+      const parsed = parseExcelBuffer(evt.target.result);
+      if (parsed && parsed.length > 0) {
+        document.getElementById('productCountBadge').textContent = "Broadcasting update...";
+
+        // Local cache
+        lubeData = parsed;
+        await saveToDB("saved_lube_data", lubeData);
+
+        // Broadcast to shared cloud storage
+        try {
+          await fetch(SHARED_STORAGE_API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(parsed)
+          });
+        } catch (err) {
+          console.warn("Cloud sync warning:", err);
+        }
+
+        document.getElementById('productCountBadge').textContent = `${lubeData.length} Products Loaded (Live Sync)`;
+        showAdminConfirmation(file.name, parsed.length);
+
+        document.getElementById('productInput').value = '';
+        document.getElementById('resultsCard').style.display = 'none';
+      } else {
+        alert("Error: File format does not match expected circular columns.");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    excelFileInput.value = '';
+  });
+
+  function showAdminConfirmation(fileName, count) {
+    const summary = document.getElementById('confirmSummary');
+    const now = new Date();
+    summary.innerHTML = `
+      <strong>File:</strong> ${fileName}<br/>
+      <strong>Products Synced:</strong> ${count} SKUs<br/>
+      <strong>Time:</strong> ${now.toLocaleTimeString()} (${now.toLocaleDateString()})<br/>
+      <div style="margin-top: 8px; color: #16a34a; font-weight: 600;">
+        ✓ Updated across all connected devices immediately.
+      </div>
+    `;
+    document.getElementById('confirmModal').style.display = 'flex';
+  }
+
+  function closeConfirmModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+  }
+
+  // --- Autocomplete & Search ---
+  const input = document.getElementById('productInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const suggestionsBox = document.getElementById('suggestionsBox');
+  const resultsCard = document.getElementById('resultsCard');
+
+  input.addEventListener('input', function() {
+    const val = this.value.trim().toLowerCase();
+    clearBtn.style.display = this.value.length > 0 ? 'flex' : 'none';
+
+    if (!val) {
+      suggestionsBox.style.display = 'none';
+      resultsCard.style.display = 'none';
+      return;
     }
 
-    function showAdminConfirmation(fileName, count, sha) {
-      const summary = document.getElementById('confirmSummary');
-      const now = new Date();
-      summary.innerHTML = `
-        <strong>File Uploaded:</strong> ${fileName}<br/>
-        <strong>Products Synced:</strong> ${count} SKUs<br/>
-        <strong>Time:</strong> ${now.toLocaleTimeString()} (${now.toLocaleDateString()})<br/>
-        <strong>Commit ID:</strong> <code>${(sha || "").substring(0, 7) || "Saved"}</code><br/>
-        <div style="margin-top: 8px; color: #16a34a; font-weight: 600;">
-          ✓ All user devices will now see these updated prices immediately.
-        </div>
-      `;
-      document.getElementById('confirmModal').style.display = 'flex';
+    const matches = lubeData.filter(item => item.name.toLowerCase().includes(val));
+
+    if (matches.length > 0) {
+      suggestionsBox.innerHTML = '';
+      matches.slice(0, 20).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        div.textContent = item.name;
+        div.addEventListener('click', () => {
+          input.value = item.name;
+          suggestionsBox.style.display = 'none';
+          clearBtn.style.display = 'flex';
+          displayCalculation(item);
+        });
+        suggestionsBox.appendChild(div);
+      });
+      suggestionsBox.style.display = 'block';
+    } else {
+      suggestionsBox.style.display = 'none';
     }
-  </script>
+
+    const exact = lubeData.find(item => item.name.toLowerCase() === val);
+    if (exact) {
+      displayCalculation(exact);
+    }
+  });
+
+  clearBtn.addEventListener('click', function() {
+    input.value = '';
+    clearBtn.style.display = 'none';
+    suggestionsBox.style.display = 'none';
+    resultsCard.style.display = 'none';
+    input.focus();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-group')) {
+      suggestionsBox.style.display = 'none';
+    }
+  });
+
+  // --- Display Product Prices ---
+  function displayCalculation(item) {
+    document.getElementById('outProductName').textContent = item.name;
+    document.getElementById('outEffDLP').textContent = `₹ ${item.effDlp.toFixed(2)}`;
+    document.getElementById('outMRP').textContent = `₹ ${item.mrp.toFixed(2)}`;
+    document.getElementById('outDLP').textContent = `₹ ${item.dlp.toFixed(2)}`;
+    document.getElementById('outHODisc').textContent = `₹ ${item.hoDisc.toFixed(2)}`;
+    resultsCard.style.display = 'block';
+  }
+
+  // Initial load
+  loadCentralCircular();
+</script>
+
 </body>
 </html>
