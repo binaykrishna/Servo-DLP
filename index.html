@@ -282,7 +282,7 @@
     .modal-box {
       background: white;
       border-radius: 12px;
-      max-width: 480px;
+      max-width: 440px;
       width: 100%;
       padding: 24px;
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
@@ -316,12 +316,6 @@
       font-size: 0.9rem;
     }
 
-    .form-help {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
     .btn-group {
       display: flex;
       justify-content: flex-end;
@@ -348,7 +342,7 @@
       font-weight: 600;
     }
 
-    /* Confirmation Modal Styles */
+    /* Confirmation Modal */
     .confirm-card {
       text-align: center;
       padding: 10px;
@@ -392,7 +386,7 @@
   <div class="top-bar">
     <div class="date-display" id="dateDisplay"></div>
     <div class="top-actions">
-      <button class="btn-action" onclick="fetchPriceData(true)" title="Fetch newest circular">↻ Refresh</button>
+      <button class="btn-action" onclick="fetchPriceData(true)">↻ Refresh</button>
       <button class="btn-action" onclick="openAdminModal()">Admin Login</button>
     </div>
   </div>
@@ -451,14 +445,14 @@
     User to verify the prices from circular.
   </footer>
 
-  <!-- Admin Upload Modal -->
+  <!-- Admin Modal -->
   <div class="modal-backdrop" id="adminModal">
     <div class="modal-box">
       <div id="authSection">
         <h2 class="modal-title">Admin Authentication</h2>
         <div class="form-group">
-          <label class="form-label">Passcode</label>
-          <input type="password" id="passcode" class="form-input" placeholder="Enter 6-digit passcode" />
+          <label class="form-label">Enter Passcode</label>
+          <input type="password" id="passcode" class="form-input" placeholder="Passcode" />
         </div>
         <div class="btn-group">
           <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
@@ -466,33 +460,22 @@
         </div>
       </div>
 
+      <!-- Only Price Circular File Upload is shown -->
       <div id="uploadSection" style="display:none;">
         <h2 class="modal-title">Upload Price Circular</h2>
         
-        <div class="form-group">
-          <label class="form-label">GitHub Repository</label>
-          <input type="text" id="ghRepo" class="form-input" placeholder="username/repository-name" />
-          <div class="form-help">e.g. <code>yourname/servo-pricing</code></div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">GitHub Token (Contents: Read & Write)</label>
-          <input type="password" id="ghToken" class="form-input" placeholder="ghp_xxxxxxxxxxxx" />
-          <div class="form-help">Saved only in this admin device's browser.</div>
-        </div>
-
         <div class="form-group">
           <label class="form-label">Select Price Circular (.xlsx)</label>
           <input type="file" id="circularFile" accept=".xlsx, .xls" class="form-input" />
         </div>
 
         <div id="uploadProgress" style="display:none; font-size: 0.9rem; font-weight: 600; color: #3182ce; margin-bottom: 10px;">
-          Uploading and syncing across all devices...
+          Uploading and updating all devices...
         </div>
 
         <div class="btn-group">
           <button class="btn-cancel" onclick="closeAdminModal()">Close</button>
-          <button class="btn-submit" id="pushBtn" onclick="processAndPushCircular()">Upload & Sync All Devices</button>
+          <button class="btn-submit" id="pushBtn" onclick="processAndPushCircular()">Upload Circular</button>
         </div>
       </div>
     </div>
@@ -502,18 +485,25 @@
   <div class="modal-backdrop" id="confirmModal">
     <div class="modal-box confirm-card">
       <div class="confirm-icon">✓</div>
-      <h2 class="confirm-title">Circular Synced Successfully!</h2>
+      <h2 class="confirm-title">Price Circular Uploaded!</h2>
       <p style="color: #4a5568; font-size: 0.95rem;">Changes are now live across all user devices.</p>
       
-      <div class="confirm-details" id="confirmSummary">
-        <!-- Details inserted dynamically -->
-      </div>
+      <div class="confirm-details" id="confirmSummary"></div>
 
       <button class="btn-submit" style="width: 100%;" onclick="closeConfirmModal()">Done</button>
     </div>
   </div>
 
   <script>
+    // Hardcoded GitHub Repository Settings
+    const GH_OWNER = "Binaykrishna";
+    const GH_REPO = "Servo-DLP";
+    const REPO_PATH = `${GH_OWNER}/${GH_REPO}`;
+
+    // Place your GitHub Personal Access Token (PAT) here if you want it preconfigured,
+    // or run `localStorage.setItem('servo_admin_token', 'your_token')` in the admin console.
+    const ADMIN_GH_TOKEN = localStorage.getItem('servo_admin_token') || "";
+
     let priceData = [];
 
     // Current Date
@@ -524,38 +514,17 @@
     }
     updateDate();
 
-    // Determine the repository from settings or current URL
-    function getRepoConfig() {
-      const stored = localStorage.getItem('servo_gh_repo');
-      if (stored) return stored.trim();
-
-      // If hosted on https://<username>.github.io/<repo>/
-      const hostParts = window.location.hostname.split('.');
-      if (hostParts.length >= 3 && hostParts[1] === 'github' && hostParts[2] === 'io') {
-        const username = hostParts[0];
-        const pathParts = window.location.pathname.split('/').filter(Boolean);
-        const repo = pathParts[0] || '';
-        if (username && repo) return `${username}/${repo}`;
-      }
-      return '';
-    }
-
-    // Direct, zero-cache data fetching
+    // Cache-free live data retrieval
     async function fetchPriceData(manualTrigger = false) {
       const syncStatus = document.getElementById('syncStatus');
-      const repo = getRepoConfig();
       syncStatus.textContent = "Loading prices...";
       syncStatus.style.background = "#edf2f7";
       syncStatus.style.color = "#718096";
 
-      // 1. First priority: Fetch raw file directly from GitHub API / Raw to eliminate CDN cache completely
-      const urlsToTry = [];
-      if (repo) {
-        // Raw GitHub URL with timestamp prevents CDN/GitHub Pages delay
-        urlsToTry.push(`https://raw.githubusercontent.com/${repo}/main/data.json?cache_bypass=${Date.now()}`);
-      }
-      // Fallback: local root file
-      urlsToTry.push(`data.json?cache_bypass=${Date.now()}`);
+      const urlsToTry = [
+        `https://raw.githubusercontent.com/${REPO_PATH}/main/data.json?cache_bypass=${Date.now()}`,
+        `data.json?cache_bypass=${Date.now()}`
+      ];
 
       for (const url of urlsToTry) {
         try {
@@ -572,9 +541,7 @@
               return;
             }
           }
-        } catch (e) {
-          // Continue to next URL fallback
-        }
+        } catch (e) {}
       }
 
       syncStatus.textContent = "No circular uploaded yet. Admin can upload via Admin Login.";
@@ -582,10 +549,9 @@
       syncStatus.style.color = "#991b1b";
     }
 
-    // Auto-fetch immediately
     fetchPriceData();
 
-    // Auto-complete Search Logic
+    // Autocomplete Search
     function handleSearchInput() {
       const input = document.getElementById('productSearch');
       const clearBtn = document.getElementById('clearBtn');
@@ -626,7 +592,6 @@
       document.getElementById('suggestionsBox').style.display = 'none';
       document.getElementById('clearBtn').style.display = 'flex';
 
-      // Show Details
       document.getElementById('cardProductName').textContent = item.name;
       document.getElementById('cardEffDlp').textContent = formatCurrency(item.effDlp);
       document.getElementById('cardMrp').textContent = formatCurrency(item.mrp);
@@ -641,14 +606,12 @@
       return isNaN(num) ? "₹0.00" : `₹${num.toFixed(2)}`;
     }
 
-    // Admin Modal Controls
+    // Modal controls
     function openAdminModal() {
       document.getElementById('adminModal').style.display = 'flex';
       document.getElementById('authSection').style.display = 'block';
       document.getElementById('uploadSection').style.display = 'none';
       document.getElementById('passcode').value = '';
-      document.getElementById('ghToken').value = localStorage.getItem('servo_gh_token') || '';
-      document.getElementById('ghRepo').value = getRepoConfig();
     }
 
     function closeAdminModal() {
@@ -669,11 +632,9 @@
       document.getElementById('confirmModal').style.display = 'none';
     }
 
-    // Process & Commit to GitHub
+    // Process & Commit XLSX
     async function processAndPushCircular() {
       const fileInput = document.getElementById('circularFile');
-      const token = document.getElementById('ghToken').value.trim();
-      const repo = document.getElementById('ghRepo').value.trim();
       const progress = document.getElementById('uploadProgress');
       const pushBtn = document.getElementById('pushBtn');
 
@@ -681,14 +642,13 @@
         alert('Please choose an Excel (.xlsx) file.');
         return;
       }
-      if (!token || !repo) {
-        alert('Please enter your GitHub Token and Repo (format: username/repository).');
-        return;
-      }
 
-      // Save credentials locally on Admin device
-      localStorage.setItem('servo_gh_token', token);
-      localStorage.setItem('servo_gh_repo', repo);
+      let token = ADMIN_GH_TOKEN;
+      if (!token) {
+        token = prompt("Please provide GitHub Personal Access Token (saved in your device for future uploads):");
+        if (!token) return;
+        localStorage.setItem('servo_admin_token', token.trim());
+      }
 
       progress.style.display = 'block';
       progress.style.color = '#3182ce';
@@ -705,8 +665,7 @@
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
 
-          // Mapping:
-          // Col E = index 4 (DLP), Col F = index 5 (MRP), Col H = index 7 (HO Disc), Col I = index 8 (Eff DLP)
+          // Columns: Col E (index 4) DLP, Col F (index 5) MRP, Col H (index 7) HO Disc, Col I (index 8) Eff DLP
           const parsed = [];
           for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
@@ -725,23 +684,16 @@
             throw new Error("No valid product records found in columns E, F, H, I.");
           }
 
-          progress.textContent = 'Pushing to GitHub & broadcasting to all devices...';
+          progress.textContent = 'Pushing update to GitHub...';
 
-          // Commit directly to GitHub
-          const commitRes = await commitToGitHub(repo, token, parsed);
+          const commitRes = await commitToGitHub(REPO_PATH, token, parsed);
 
-          // Update local memory
           priceData = parsed;
-
-          // Close upload dialog
           closeAdminModal();
           progress.style.display = 'none';
           pushBtn.disabled = false;
 
-          // Show Confirmation Modal to Admin
           showAdminConfirmation(file.name, parsed.length, commitRes.sha);
-
-          // Refresh display status
           fetchPriceData();
 
         } catch (err) {
@@ -758,7 +710,6 @@
       const path = 'data.json';
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
       
-      // 1. Get existing file SHA
       let sha = '';
       try {
         const getRes = await fetch(url, {
@@ -773,7 +724,6 @@
         }
       } catch (e) {}
 
-      // 2. Base64 encode JSON
       const jsonStr = JSON.stringify(contentObject, null, 2);
       const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
 
@@ -783,7 +733,6 @@
       };
       if (sha) body.sha = sha;
 
-      // 3. Put new commit
       const putRes = await fetch(url, {
         method: 'PUT',
         headers: {
@@ -811,7 +760,7 @@
         <strong>Time:</strong> ${now.toLocaleTimeString()} (${now.toLocaleDateString()})<br/>
         <strong>Commit ID:</strong> <code>${(sha || "").substring(0, 7) || "Saved"}</code><br/>
         <div style="margin-top: 8px; color: #16a34a; font-weight: 600;">
-          ✓ All connected devices fetching via GitHub will now reflect these updated prices.
+          ✓ All user devices will now see these updated prices immediately.
         </div>
       `;
       document.getElementById('confirmModal').style.display = 'flex';
