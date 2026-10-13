@@ -10,11 +10,12 @@
       --primary: #d9381e;
       --primary-dark: #b32a13;
       --secondary: #1a202c;
-      --bg: #f7fafc;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
       --border: #e2e8f0;
       --text: #2d3748;
       --text-muted: #718096;
+      --success: #22c55e;
     }
 
     * {
@@ -49,7 +50,13 @@
       font-size: 0.95rem;
     }
 
-    .admin-btn {
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-action {
       background: #edf2f7;
       color: var(--secondary);
       border: 1px solid var(--border);
@@ -61,11 +68,11 @@
       transition: background 0.2s;
     }
 
-    .admin-btn:hover {
+    .btn-action:hover {
       background: #e2e8f0;
     }
 
-    /* Main Container */
+    /* Container */
     .container {
       max-width: 650px;
       width: 100%;
@@ -86,13 +93,18 @@
       letter-spacing: -0.5px;
     }
 
-    .subtitle {
-      font-size: 0.9rem;
+    .sync-badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      background: #edf2f7;
       color: var(--text-muted);
-      margin-top: 4px;
     }
 
-    /* Search Input with Clear Button */
+    /* Search Box */
     .search-wrapper {
       position: relative;
       margin-bottom: 24px;
@@ -138,7 +150,7 @@
       color: var(--secondary);
     }
 
-    /* Dropdown Suggestions */
+    /* Autocomplete Suggestions */
     .suggestions {
       position: absolute;
       top: 100%;
@@ -148,10 +160,10 @@
       border: 1px solid var(--border);
       border-top: none;
       border-radius: 0 0 10px 10px;
-      max-height: 250px;
+      max-height: 260px;
       overflow-y: auto;
       z-index: 50;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
       display: none;
     }
 
@@ -195,7 +207,7 @@
       background: #fff5f5;
       border: 1px solid #fed7d7;
       border-radius: 8px;
-      padding: 16px;
+      padding: 18px;
       margin-bottom: 20px;
       text-align: center;
     }
@@ -209,13 +221,13 @@
     }
 
     .eff-dlp-val {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
       color: var(--primary-dark);
       margin-top: 4px;
     }
 
-    /* Price Grid */
+    /* Price Breakdown Grid */
     .price-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -223,7 +235,7 @@
     }
 
     .price-tile {
-      background: #f7fafc;
+      background: #f8fafc;
       padding: 12px;
       border-radius: 8px;
       border: 1px solid var(--border);
@@ -239,7 +251,7 @@
     }
 
     .tile-value {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--secondary);
     }
@@ -255,11 +267,11 @@
       font-weight: 600;
     }
 
-    /* Modal */
+    /* Modals */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.55);
       display: none;
       align-items: center;
       justify-content: center;
@@ -270,14 +282,14 @@
     .modal-box {
       background: white;
       border-radius: 12px;
-      max-width: 440px;
+      max-width: 480px;
       width: 100%;
       padding: 24px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
     }
 
     .modal-title {
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
       margin-bottom: 16px;
       color: var(--secondary);
@@ -304,6 +316,12 @@
       font-size: 0.9rem;
     }
 
+    .form-help {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
     .btn-group {
       display: flex;
       justify-content: flex-end;
@@ -315,7 +333,7 @@
       background: var(--primary);
       color: white;
       border: none;
-      padding: 9px 18px;
+      padding: 10px 18px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
@@ -324,16 +342,47 @@
     .btn-cancel {
       background: #edf2f7;
       border: none;
-      padding: 9px 16px;
+      padding: 10px 16px;
       border-radius: 6px;
       cursor: pointer;
+      font-weight: 600;
     }
 
-    .status-msg {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: none;
+    /* Confirmation Modal Styles */
+    .confirm-card {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .confirm-icon {
+      width: 60px;
+      height: 60px;
+      background: #dcfce7;
+      color: #16a34a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 16px auto;
+    }
+
+    .confirm-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #15803d;
+      margin-bottom: 8px;
+    }
+
+    .confirm-details {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 0.9rem;
+      text-align: left;
+      margin: 16px 0;
+      line-height: 1.6;
     }
   </style>
 </head>
@@ -342,14 +391,17 @@
   <!-- Top Bar -->
   <div class="top-bar">
     <div class="date-display" id="dateDisplay"></div>
-    <button class="admin-btn" onclick="openAdminModal()">Admin Login</button>
+    <div class="top-actions">
+      <button class="btn-action" onclick="fetchPriceData(true)" title="Fetch newest circular">↻ Refresh</button>
+      <button class="btn-action" onclick="openAdminModal()">Admin Login</button>
+    </div>
   </div>
 
   <!-- Content Container -->
   <div class="container">
     <div class="title-section">
       <h1 class="brand-title">SERVO PRICING PORTAL</h1>
-      <p class="subtitle" id="syncStatus">Fetching latest circular...</p>
+      <div class="sync-badge" id="syncStatus">Checking for circular...</div>
     </div>
 
     <!-- Product Search Box -->
@@ -358,7 +410,7 @@
         type="text"
         class="search-input"
         id="productSearch"
-        placeholder="Search product name..."
+        placeholder="Type product name to search..."
         autocomplete="off"
         oninput="handleSearchInput()"
       />
@@ -394,7 +446,7 @@
     </div>
   </div>
 
-  <!-- Mandatory Statutory Notice -->
+  <!-- Statutory Footnote -->
   <footer>
     User to verify the prices from circular.
   </footer>
@@ -402,12 +454,11 @@
   <!-- Admin Upload Modal -->
   <div class="modal-backdrop" id="adminModal">
     <div class="modal-box">
-      <h2 class="modal-title">Admin Price Circular Sync</h2>
-      
       <div id="authSection">
+        <h2 class="modal-title">Admin Authentication</h2>
         <div class="form-group">
-          <label class="form-label">Enter Passcode</label>
-          <input type="password" id="passcode" class="form-input" placeholder="Passcode" />
+          <label class="form-label">Passcode</label>
+          <input type="password" id="passcode" class="form-input" placeholder="Enter 6-digit passcode" />
         </div>
         <div class="btn-group">
           <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
@@ -416,31 +467,56 @@
       </div>
 
       <div id="uploadSection" style="display:none;">
+        <h2 class="modal-title">Upload Price Circular</h2>
+        
         <div class="form-group">
-          <label class="form-label">GitHub Token (Saved locally on this device)</label>
+          <label class="form-label">GitHub Repository</label>
+          <input type="text" id="ghRepo" class="form-input" placeholder="username/repository-name" />
+          <div class="form-help">e.g. <code>yourname/servo-pricing</code></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">GitHub Token (Contents: Read & Write)</label>
           <input type="password" id="ghToken" class="form-input" placeholder="ghp_xxxxxxxxxxxx" />
+          <div class="form-help">Saved only in this admin device's browser.</div>
         </div>
+
         <div class="form-group">
-          <label class="form-label">GitHub Repo (username/repository)</label>
-          <input type="text" id="ghRepo" class="form-input" placeholder="e.g., yourname/servo-pricing" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Upload Price Circular (.xlsx)</label>
+          <label class="form-label">Select Price Circular (.xlsx)</label>
           <input type="file" id="circularFile" accept=".xlsx, .xls" class="form-input" />
         </div>
-        <div class="status-msg" id="uploadStatus"></div>
+
+        <div id="uploadProgress" style="display:none; font-size: 0.9rem; font-weight: 600; color: #3182ce; margin-bottom: 10px;">
+          Uploading and syncing across all devices...
+        </div>
+
         <div class="btn-group">
           <button class="btn-cancel" onclick="closeAdminModal()">Close</button>
-          <button class="btn-submit" onclick="processAndPushCircular()">Push to All Devices</button>
+          <button class="btn-submit" id="pushBtn" onclick="processAndPushCircular()">Upload & Sync All Devices</button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Admin Upload Confirmation Modal -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="modal-box confirm-card">
+      <div class="confirm-icon">✓</div>
+      <h2 class="confirm-title">Circular Synced Successfully!</h2>
+      <p style="color: #4a5568; font-size: 0.95rem;">Changes are now live across all user devices.</p>
+      
+      <div class="confirm-details" id="confirmSummary">
+        <!-- Details inserted dynamically -->
+      </div>
+
+      <button class="btn-submit" style="width: 100%;" onclick="closeConfirmModal()">Done</button>
     </div>
   </div>
 
   <script>
     let priceData = [];
 
-    // Initialize Date
+    // Current Date
     function updateDate() {
       const today = new Date();
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -448,22 +524,66 @@
     }
     updateDate();
 
-    // Load price data from GitHub repository directly
-    async function loadPriceData() {
-      const syncStatus = document.getElementById('syncStatus');
-      try {
-        // Fetches data.json from the same directory with cache busting
-        const res = await fetch(`data.json?t=${Date.now()}`);
-        if (!res.ok) throw new Error("Price data file not found");
-        priceData = await res.json();
-        syncStatus.textContent = `Circular loaded (${priceData.length} products available)`;
-        syncStatus.style.color = "#38a169";
-      } catch (err) {
-        syncStatus.textContent = "Please upload circular from Admin panel.";
-        syncStatus.style.color = "#e53e3e";
+    // Determine the repository from settings or current URL
+    function getRepoConfig() {
+      const stored = localStorage.getItem('servo_gh_repo');
+      if (stored) return stored.trim();
+
+      // If hosted on https://<username>.github.io/<repo>/
+      const hostParts = window.location.hostname.split('.');
+      if (hostParts.length >= 3 && hostParts[1] === 'github' && hostParts[2] === 'io') {
+        const username = hostParts[0];
+        const pathParts = window.location.pathname.split('/').filter(Boolean);
+        const repo = pathParts[0] || '';
+        if (username && repo) return `${username}/${repo}`;
       }
+      return '';
     }
-    loadPriceData();
+
+    // Direct, zero-cache data fetching
+    async function fetchPriceData(manualTrigger = false) {
+      const syncStatus = document.getElementById('syncStatus');
+      const repo = getRepoConfig();
+      syncStatus.textContent = "Loading prices...";
+      syncStatus.style.background = "#edf2f7";
+      syncStatus.style.color = "#718096";
+
+      // 1. First priority: Fetch raw file directly from GitHub API / Raw to eliminate CDN cache completely
+      const urlsToTry = [];
+      if (repo) {
+        // Raw GitHub URL with timestamp prevents CDN/GitHub Pages delay
+        urlsToTry.push(`https://raw.githubusercontent.com/${repo}/main/data.json?cache_bypass=${Date.now()}`);
+      }
+      // Fallback: local root file
+      urlsToTry.push(`data.json?cache_bypass=${Date.now()}`);
+
+      for (const url of urlsToTry) {
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (res.ok) {
+            const parsed = await res.json();
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              priceData = parsed;
+              const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              syncStatus.textContent = `● Active Circular: ${priceData.length} SKUs (Updated: ${timestamp})`;
+              syncStatus.style.background = "#dcfce7";
+              syncStatus.style.color = "#15803d";
+              if (manualTrigger) alert(`Circular updated! Loaded ${priceData.length} products.`);
+              return;
+            }
+          }
+        } catch (e) {
+          // Continue to next URL fallback
+        }
+      }
+
+      syncStatus.textContent = "No circular uploaded yet. Admin can upload via Admin Login.";
+      syncStatus.style.background = "#fee2e2";
+      syncStatus.style.color = "#991b1b";
+    }
+
+    // Auto-fetch immediately
+    fetchPriceData();
 
     // Auto-complete Search Logic
     function handleSearchInput() {
@@ -484,7 +604,7 @@
       ).slice(0, 15);
 
       if (matches.length === 0) {
-        suggestions.innerHTML = '<div class="suggestion-item" style="color:#a0aec0;cursor:default;">No products found</div>';
+        suggestions.innerHTML = '<div class="suggestion-item" style="color:#a0aec0;cursor:default;">No matching product found</div>';
       } else {
         suggestions.innerHTML = matches.map(m => 
           `<div class="suggestion-item" onclick="selectProduct('${encodeURIComponent(JSON.stringify(m))}')">${m.name}</div>`
@@ -521,14 +641,14 @@
       return isNaN(num) ? "₹0.00" : `₹${num.toFixed(2)}`;
     }
 
-    // Modal & Authentication
+    // Admin Modal Controls
     function openAdminModal() {
       document.getElementById('adminModal').style.display = 'flex';
       document.getElementById('authSection').style.display = 'block';
       document.getElementById('uploadSection').style.display = 'none';
       document.getElementById('passcode').value = '';
       document.getElementById('ghToken').value = localStorage.getItem('servo_gh_token') || '';
-      document.getElementById('ghRepo').value = localStorage.getItem('servo_gh_repo') || '';
+      document.getElementById('ghRepo').value = getRepoConfig();
     }
 
     function closeAdminModal() {
@@ -536,7 +656,7 @@
     }
 
     function verifyPasscode() {
-      const code = document.getElementById('passcode').value;
+      const code = document.getElementById('passcode').value.trim();
       if (code === '011100') {
         document.getElementById('authSection').style.display = 'none';
         document.getElementById('uploadSection').style.display = 'block';
@@ -545,29 +665,35 @@
       }
     }
 
-    // Process XLSX and Push to GitHub Repository
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    // Process & Commit to GitHub
     async function processAndPushCircular() {
       const fileInput = document.getElementById('circularFile');
       const token = document.getElementById('ghToken').value.trim();
       const repo = document.getElementById('ghRepo').value.trim();
-      const status = document.getElementById('uploadStatus');
+      const progress = document.getElementById('uploadProgress');
+      const pushBtn = document.getElementById('pushBtn');
 
       if (!fileInput.files.length) {
-        alert('Please choose an Excel file.');
+        alert('Please choose an Excel (.xlsx) file.');
         return;
       }
       if (!token || !repo) {
-        alert('Please enter your GitHub Token and Repo (e.g., username/servo-portal).');
+        alert('Please enter your GitHub Token and Repo (format: username/repository).');
         return;
       }
 
-      // Save for convenience on the admin's device
+      // Save credentials locally on Admin device
       localStorage.setItem('servo_gh_token', token);
       localStorage.setItem('servo_gh_repo', repo);
 
-      status.style.display = 'block';
-      status.style.color = '#3182ce';
-      status.textContent = 'Parsing Excel sheet...';
+      progress.style.display = 'block';
+      progress.style.color = '#3182ce';
+      progress.textContent = 'Parsing Excel sheet...';
+      pushBtn.disabled = true;
 
       const file = fileInput.files[0];
       const reader = new FileReader();
@@ -579,35 +705,49 @@
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
 
-          // Parse mapped columns:
-          // Column E = index 4 (DLP), Column F = index 5 (MRP), Column H = index 7 (HO Disc), Column I = index 8 (Eff DLP)
+          // Mapping:
+          // Col E = index 4 (DLP), Col F = index 5 (MRP), Col H = index 7 (HO Disc), Col I = index 8 (Eff DLP)
           const parsed = [];
           for (let i = 1; i < rows.length; i++) {
             const r = rows[i];
-            const name = (r[1] || r[2] || r[0] || "").toString().trim(); // Product description / name
+            const name = (r[1] || r[2] || r[0] || "").toString().trim();
             const dlp = parseFloat(r[4]) || 0;
             const mrp = parseFloat(r[5]) || 0;
             const hoDisc = parseFloat(r[7]) || 0;
             const effDlp = parseFloat(r[8]) || 0;
 
-            if (name) {
+            if (name && (effDlp > 0 || mrp > 0 || dlp > 0)) {
               parsed.push({ name, dlp, mrp, hoDisc, effDlp });
             }
           }
 
-          status.textContent = 'Updating across all devices via GitHub...';
+          if (parsed.length === 0) {
+            throw new Error("No valid product records found in columns E, F, H, I.");
+          }
 
-          // Commit to GitHub via API
-          await commitToGitHub(repo, token, parsed);
+          progress.textContent = 'Pushing to GitHub & broadcasting to all devices...';
 
-          status.style.color = '#38a169';
-          status.textContent = 'Successfully synced across all devices!';
+          // Commit directly to GitHub
+          const commitRes = await commitToGitHub(repo, token, parsed);
+
+          // Update local memory
           priceData = parsed;
-          setTimeout(() => closeAdminModal(), 1500);
+
+          // Close upload dialog
+          closeAdminModal();
+          progress.style.display = 'none';
+          pushBtn.disabled = false;
+
+          // Show Confirmation Modal to Admin
+          showAdminConfirmation(file.name, parsed.length, commitRes.sha);
+
+          // Refresh display status
+          fetchPriceData();
 
         } catch (err) {
-          status.style.color = '#e53e3e';
-          status.textContent = 'Error: ' + err.message;
+          progress.style.color = '#e53e3e';
+          progress.textContent = 'Error: ' + err.message;
+          pushBtn.disabled = false;
         }
       };
 
@@ -618,11 +758,14 @@
       const path = 'data.json';
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
       
-      // Get existing file SHA if it exists
+      // 1. Get existing file SHA
       let sha = '';
       try {
         const getRes = await fetch(url, {
-          headers: { 'Authorization': `token ${token}` }
+          headers: { 
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
         });
         if (getRes.ok) {
           const fileInfo = await getRes.json();
@@ -630,29 +773,48 @@
         }
       } catch (e) {}
 
-      // UTF-8 base64 encoding
+      // 2. Base64 encode JSON
       const jsonStr = JSON.stringify(contentObject, null, 2);
       const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
 
       const body = {
-        message: 'Update price circular via Admin Portal',
+        message: `Admin circular update: ${new Date().toISOString()}`,
         content: encodedContent
       };
       if (sha) body.sha = sha;
 
+      // 3. Put new commit
       const putRes = await fetch(url, {
         method: 'PUT',
         headers: {
           'Authorization': `token ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
         },
         body: JSON.stringify(body)
       });
 
       if (!putRes.ok) {
-        const errorData = await putRes.json();
-        throw new Error(errorData.message || 'Failed to update GitHub repository.');
+        const errObj = await putRes.json();
+        throw new Error(errObj.message || 'GitHub commit failed');
       }
+
+      return await putRes.json();
+    }
+
+    function showAdminConfirmation(fileName, count, sha) {
+      const summary = document.getElementById('confirmSummary');
+      const now = new Date();
+      summary.innerHTML = `
+        <strong>File Uploaded:</strong> ${fileName}<br/>
+        <strong>Products Synced:</strong> ${count} SKUs<br/>
+        <strong>Time:</strong> ${now.toLocaleTimeString()} (${now.toLocaleDateString()})<br/>
+        <strong>Commit ID:</strong> <code>${(sha || "").substring(0, 7) || "Saved"}</code><br/>
+        <div style="margin-top: 8px; color: #16a34a; font-weight: 600;">
+          ✓ All connected devices fetching via GitHub will now reflect these updated prices.
+        </div>
+      `;
+      document.getElementById('confirmModal').style.display = 'flex';
     }
   </script>
 </body>
