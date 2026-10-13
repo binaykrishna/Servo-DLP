@@ -1,720 +1,659 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Servo Product Pricing Portal</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- SheetJS for XLSX parsing with fallback -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servo Pricing Portal</title>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-  <script>
-    if (typeof XLSX === 'undefined') {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"><\/script>');
-    }
-  </script>
-
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- Inter Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            brand: {
-              navy: '#03204c',
-              navyLight: '#0d326c',
-              orange: '#f36f21',
-              orangeHover: '#d85910',
-              accent: '#ff8533'
-            }
-          }
-        }
-      }
-    }
-  </script>
   <style>
-    /* Clean custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f8fafc; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    :root {
+      --primary: #d9381e;
+      --primary-dark: #b32a13;
+      --secondary: #1a202c;
+      --bg: #f7fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #2d3748;
+      --text-muted: #718096;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .date-display {
+      font-weight: 600;
+      color: var(--secondary);
+      font-size: 0.95rem;
+    }
+
+    .admin-btn {
+      background: #edf2f7;
+      color: var(--secondary);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .admin-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 650px;
+      width: 100%;
+      margin: 30px auto;
+      padding: 0 16px;
+      flex: 1;
+    }
+
+    .title-section {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      color: var(--primary);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Search Input with Clear Button */
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 44px 14px 16px;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--card-bg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(217, 56, 30, 0.15);
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #e2e8f0;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    .clear-btn:hover {
+      background: #cbd5e0;
+      color: var(--secondary);
+    }
+
+    /* Dropdown Suggestions */
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      z-index: 50;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .suggestion-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 0.95rem;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+      background-color: #fff5f5;
+      color: var(--primary);
+    }
+
+    /* Result Card */
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      display: none;
+    }
+
+    .product-heading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    /* Eff DLP Highlight Box */
+    .eff-dlp-banner {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .eff-dlp-label {
+      font-size: 0.85rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .eff-dlp-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-top: 4px;
+    }
+
+    /* Price Grid */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .price-tile {
+      background: #f7fafc;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .tile-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .tile-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      padding: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #e53e3e;
+      font-weight: 600;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 12px;
+      max-width: 440px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--secondary);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-submit {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-cancel {
+      background: #edf2f7;
+      border: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .status-msg {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col antialiased selection:bg-orange-100 selection:text-orange-900">
+<body>
 
-  <!-- Top Bar: Current Date & Admin Upload Trigger (No EB Slab) -->
-  <header class="bg-brand-navy text-white text-xs sm:text-sm py-3 px-4 sm:px-8 shadow-md sticky top-0 z-40 border-b border-brand-navyLight">
-    <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
-      
-      <!-- Live Date Display (e.g., 'Tuesday, 13 October 2026') -->
-      <div class="flex items-center space-x-2.5 text-slate-200">
-        <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-brand-orange">
-          <i data-lucide="calendar" class="w-4 h-4"></i>
-        </div>
-        <div>
-          <span class="text-[10px] uppercase tracking-wider text-slate-400 block leading-tight font-medium">Pricing Date</span>
-          <strong id="topBarDate" class="text-white font-semibold text-xs sm:text-sm">--</strong>
-        </div>
-      </div>
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="date-display" id="dateDisplay"></div>
+    <button class="admin-btn" onclick="openAdminModal()">Admin Login</button>
+  </div>
 
-      <!-- Admin Login Button -->
-      <div>
-        <button id="openAdminModalBtn" type="button" class="inline-flex items-center gap-1.5 bg-brand-navyLight hover:bg-white/15 text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition border border-white/20 shadow-xs cursor-pointer active:scale-95">
-          <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-orange"></i>
-          <span>Admin Login</span>
-        </button>
-      </div>
-
+  <!-- Content Container -->
+  <div class="container">
+    <div class="title-section">
+      <h1 class="brand-title">SERVO PRICING PORTAL</h1>
+      <p class="subtitle" id="syncStatus">Fetching latest circular...</p>
     </div>
-  </header>
 
-  <!-- Brand Banner -->
-  <div class="bg-gradient-to-r from-brand-navy via-brand-navyLight to-brand-navy text-white py-6 px-4 sm:px-6 shadow-xs border-b border-slate-200">
-    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-      <div class="flex items-center gap-4">
-        <div class="w-13 h-13 rounded-2xl bg-brand-orange flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-white/10 text-white shrink-0">
-          S
-        </div>
-        <div>
-          <h1 class="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2 justify-center sm:justify-start">
-            SERVO <span class="text-brand-orange text-xs font-bold uppercase tracking-wider bg-white/10 px-2 py-0.5 rounded border border-white/15">Pricing Portal</span>
-          </h1>
-          <p class="text-xs text-slate-300 mt-0.5">Dealer & Customer Price Lookup Circular</p>
-        </div>
+    <!-- Product Search Box -->
+    <div class="search-wrapper">
+      <input
+        type="text"
+        class="search-input"
+        id="productSearch"
+        placeholder="Search product name..."
+        autocomplete="off"
+        oninput="handleSearchInput()"
+      />
+      <button class="clear-btn" id="clearBtn" onclick="clearSearch()" title="Clear">✕</button>
+      <div class="suggestions" id="suggestionsBox"></div>
+    </div>
+
+    <!-- Pricing Card -->
+    <div class="result-card" id="resultCard">
+      <div class="product-heading" id="cardProductName">-</div>
+
+      <!-- Eff DLP Display -->
+      <div class="eff-dlp-banner">
+        <div class="eff-dlp-label">Effective DLP (Eff DLP)</div>
+        <div class="eff-dlp-val" id="cardEffDlp">₹0.00</div>
       </div>
 
-      <!-- Product Count Pill -->
-      <div class="bg-white/10 border border-white/15 px-3.5 py-1.5 rounded-xl text-xs text-slate-200 flex items-center gap-2 shadow-inner">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Active Circular: <strong id="datasetCountBadge" class="text-white font-bold">0 SKUs</strong></span>
+      <!-- Price Breakdown Grid -->
+      <div class="price-grid">
+        <div class="price-tile">
+          <div class="tile-label">MRP</div>
+          <div class="tile-value" id="cardMrp">₹0.00</div>
+        </div>
+        <div class="price-tile">
+          <div class="tile-label">DLP</div>
+          <div class="tile-value" id="cardDlp">₹0.00</div>
+        </div>
+        <div class="price-tile">
+          <div class="tile-label">HO Discount</div>
+          <div class="tile-value" id="cardHoDisc">₹0.00</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center">
-    
-    <div class="w-full bg-white rounded-2xl shadow-xl border border-slate-200/90 p-5 sm:p-8">
-      
-      <!-- Product Search Input -->
-      <div class="max-w-2xl mx-auto">
-        <div class="flex items-center justify-between mb-2">
-          <label for="productSearchInput" class="block text-sm font-bold text-slate-800">
-            Search Product / SKU Name
-          </label>
-          <span id="productCounterSub" class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-md">
-            -- SKUs loaded
-          </span>
-        </div>
-
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <i data-lucide="search" class="w-5 h-5"></i>
-          </div>
-          
-          <input 
-            type="text" 
-            id="productSearchInput" 
-            autocomplete="off"
-            placeholder="Type SKU name (e.g. SERVO SUPER 15W-40, PRIDE, 4T SYNTH...)"
-            class="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent text-sm sm:text-base font-medium transition shadow-inner"
-          />
-
-          <!-- Quick cross button to erase in one go -->
-          <button 
-            type="button" 
-            id="clearSearchBtn" 
-            title="Clear product name"
-            class="hidden absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-rose-600 transition focus:outline-none cursor-pointer"
-          >
-            <i data-lucide="x-circle" class="w-5 h-5"></i>
-          </button>
-
-          <!-- Autocomplete Dropdown List -->
-          <ul 
-            id="suggestionsDropdown" 
-            class="hidden absolute left-0 right-0 mt-2 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl z-30 divide-y divide-slate-100"
-          ></ul>
-        </div>
-        <p class="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
-          <i data-lucide="info" class="w-3.5 h-3.5 text-brand-orange"></i>
-          Auto-populates suggestions as you type. Click to view instant price details.
-        </p>
-      </div>
-
-      <!-- Pricing Display Container (Only Product Name, MRP, DLP, HO Discount, and Prominent Eff DLP) -->
-      <div id="resultContainer" class="hidden mt-8 pt-8 border-t border-slate-200">
-        
-        <div class="bg-gradient-to-br from-slate-50 via-white to-orange-50/20 rounded-2xl border border-slate-200 p-5 sm:p-7 shadow-xs">
-          
-          <!-- Top section with Product Name and Primary Eff DLP -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-200 gap-4">
-            <div class="max-w-lg">
-              <span class="text-[11px] uppercase tracking-wider font-extrabold text-brand-orange bg-orange-100/70 text-brand-orangeHover px-2.5 py-1 rounded-md border border-brand-orange/30">
-                Product Pricing Details
-              </span>
-              <h2 id="resProductName" class="text-xl sm:text-2xl font-black text-brand-navy mt-2 leading-snug">
-                --
-              </h2>
-            </div>
-
-            <!-- Prominent Effective DLP Box -->
-            <div class="bg-brand-orange/10 border-2 border-brand-orange/50 px-6 py-4 rounded-2xl text-left md:text-right shadow-xs shrink-0">
-              <span class="text-xs uppercase tracking-wider font-black text-brand-orange block">
-                Effective DLP
-              </span>
-              <div id="resEffDlp" class="text-2xl sm:text-3xl font-black text-brand-orangeHover mt-0.5">
-                ₹ --
-              </div>
-            </div>
-          </div>
-
-          <!-- Secondary Pricing Attributes: MRP, DLP, HO Discount (Pack Size, SC, Net Landing & Column IDs excluded) -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">MRP</span>
-              <span id="resMrp" class="text-lg font-bold text-slate-800 mt-1 block">--</span>
-            </div>
-            
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">DLP</span>
-              <span id="resDlp" class="text-lg font-bold text-slate-800 mt-1 block">--</span>
-            </div>
-
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">HO Discount</span>
-              <span id="resHoDisc" class="text-lg font-bold text-emerald-700 mt-1 block">--</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- No Match Found State -->
-      <div id="noMatchCard" class="hidden text-center py-10 text-slate-500">
-        <i data-lucide="search-x" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
-        <p class="text-sm font-semibold text-slate-700">No matching SKU found in the active circular.</p>
-        <p class="text-xs text-slate-400 mt-1">Check spelling or upload the latest circular via the Admin console.</p>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- Footer with Mandatory Verification Notice -->
-  <footer class="mt-auto bg-white border-t border-slate-200 py-4 px-4 text-center">
-    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-      <p class="font-extrabold text-slate-800 flex items-center gap-1.5 justify-center">
-        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
-        <span>User to verify the prices from circular.</span>
-      </p>
-      <p class="text-slate-400 font-medium">SERVO Lubricants Price Directory</p>
-    </div>
+  <!-- Mandatory Statutory Notice -->
+  <footer>
+    User to verify the prices from circular.
   </footer>
 
-  <!-- Admin Passcode Modal (Passcode: 011100) -->
-  <div id="passcodeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
-          <i data-lucide="shield-check" class="w-4 h-4 text-brand-orange"></i> Admin Authentication
-        </h3>
-        <button id="closePasscodeBtn" class="text-slate-400 hover:text-slate-600 cursor-pointer">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-      <div class="mt-4">
-        <label for="passcodeInput" class="block text-xs font-semibold text-slate-600 mb-1">Enter Admin Passcode</label>
-        <input 
-          type="password" 
-          id="passcodeInput" 
-          placeholder="••••••"
-          maxlength="10"
-          class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-center text-lg tracking-widest font-mono focus:ring-2 focus:ring-brand-orange focus:outline-none"
-        />
-        <p id="passcodeError" class="text-rose-500 text-xs mt-1.5 font-medium hidden">
-          Incorrect passcode. Access denied.
-        </p>
-      </div>
-      <div class="mt-5 flex gap-2">
-        <button id="cancelPasscodeBtn" class="w-1/2 py-2.5 px-3 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Cancel</button>
-        <button id="submitPasscodeBtn" class="w-1/2 py-2.5 px-3 rounded-xl bg-brand-orange hover:bg-brand-orangeHover text-white text-xs font-bold transition shadow cursor-pointer">Unlock</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Circular Upload Modal -->
-  <div id="adminUploadModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200">
+  <!-- Admin Upload Modal -->
+  <div class="modal-backdrop" id="adminModal">
+    <div class="modal-box">
+      <h2 class="modal-title">Admin Price Circular Sync</h2>
       
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
-        <div>
-          <h3 class="text-base sm:text-lg font-bold text-brand-navy flex items-center gap-2">
-            <i data-lucide="upload-cloud" class="w-5 h-5 text-brand-orange"></i> Upload Price Circular (XLSX)
-          </h3>
-          <p class="text-xs text-slate-500 mt-0.5">Calculations strictly rely on the uploaded circular.</p>
+      <div id="authSection">
+        <div class="form-group">
+          <label class="form-label">Enter Passcode</label>
+          <input type="password" id="passcode" class="form-input" placeholder="Passcode" />
         </div>
-        <button id="closeUploadModalBtn" class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <div class="btn-group">
+          <button class="btn-cancel" onclick="closeAdminModal()">Cancel</button>
+          <button class="btn-submit" onclick="verifyPasscode()">Verify</button>
+        </div>
       </div>
 
-      <div class="mt-5 space-y-4">
-        <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-5 hover:border-brand-orange transition">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Select Excel Spreadsheet (.xlsx, .xls)</label>
-          <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
-            Upload the official circular spreadsheet containing Product Names, DLP, MRP, HO Discount, and Effective DLP.
-          </p>
-          <input 
-            type="file" 
-            id="xlsxCircularInput" 
-            accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            class="block w-full text-xs text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-orange file:text-white hover:file:bg-brand-orangeHover file:cursor-pointer cursor-pointer"
-          />
+      <div id="uploadSection" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">GitHub Token (Saved locally on this device)</label>
+          <input type="password" id="ghToken" class="form-input" placeholder="ghp_xxxxxxxxxxxx" />
         </div>
-
-        <div id="uploadStatusBox" class="hidden p-3.5 rounded-xl text-xs font-medium border leading-relaxed"></div>
-
-        <div class="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
-          <button id="resetDemoDataBtn" type="button" class="text-xs font-semibold text-slate-600 hover:text-brand-orange flex items-center gap-1.5 cursor-pointer">
-            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reload Demo Circular
-          </button>
-          <button id="finishUploadBtn" type="button" class="bg-brand-navy hover:bg-brand-navyLight text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow cursor-pointer">
-            Done
-          </button>
+        <div class="form-group">
+          <label class="form-label">GitHub Repo (username/repository)</label>
+          <input type="text" id="ghRepo" class="form-input" placeholder="e.g., yourname/servo-pricing" />
         </div>
-
+        <div class="form-group">
+          <label class="form-label">Upload Price Circular (.xlsx)</label>
+          <input type="file" id="circularFile" accept=".xlsx, .xls" class="form-input" />
+        </div>
+        <div class="status-msg" id="uploadStatus"></div>
+        <div class="btn-group">
+          <button class="btn-cancel" onclick="closeAdminModal()">Close</button>
+          <button class="btn-submit" onclick="processAndPushCircular()">Push to All Devices</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    const REQUIRED_PASSCODE = "011100";
+    let priceData = [];
 
-    // Pre-loaded realistic sample data for instant usability
-    const INITIAL_PRODUCTS = [
-      {
-        name: "SERVO SUPER 15W-40",
-        mrp: 2350.00,
-        dlp: 1850.00,
-        hoDisc: 75.00,
-        effDlp: 1775.00
-      },
-      {
-        name: "SERVO SUPER 15W-40 ECO",
-        mrp: 495.00,
-        dlp: 395.00,
-        hoDisc: 15.00,
-        effDlp: 380.00
-      },
-      {
-        name: "SERVO PRIDE 15W-40",
-        mrp: 8550.00,
-        dlp: 6850.00,
-        hoDisc: 250.00,
-        effDlp: 6600.00
-      },
-      {
-        name: "SERVO PRIDE TC 20W-40",
-        mrp: 3300.00,
-        dlp: 2600.00,
-        hoDisc: 100.00,
-        effDlp: 2500.00
-      },
-      {
-        name: "SERVO 4T SYNTH 10W-30",
-        mrp: 620.00,
-        dlp: 480.00,
-        hoDisc: 20.00,
-        effDlp: 460.00
-      },
-      {
-        name: "SERVO GEAR SUPER 80W-90",
-        mrp: 2100.00,
-        dlp: 1650.00,
-        hoDisc: 60.00,
-        effDlp: 1590.00
-      },
-      {
-        name: "SERVO BRAKE FLUID DOT-4",
-        mrp: 260.00,
-        dlp: 195.00,
-        hoDisc: 10.00,
-        effDlp: 185.00
-      }
-    ];
-
-    let productDatabase = [];
-    let selectedProduct = null;
-
-    // Date formatting (e.g. "Tuesday, 13 October 2026")
-    function initializeTopDate() {
-      const now = new Date();
-      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-      document.getElementById('topBarDate').textContent = now.toLocaleDateString('en-GB', options);
+    // Initialize Date
+    function updateDate() {
+      const today = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('dateDisplay').textContent = today.toLocaleDateString('en-IN', options);
     }
+    updateDate();
 
-    // Number sanitizer for Excel values (handles strings like "1,850.00", "₹1850")
-    function cleanNumber(val) {
-      if (val === null || val === undefined) return 0;
-      if (typeof val === 'number') return isNaN(val) ? 0 : val;
-      const str = String(val).trim().replace(/[₹,]/g, '');
-      const parsed = parseFloat(str);
-      return isNaN(parsed) ? 0 : parsed;
+    // Load price data from GitHub repository directly
+    async function loadPriceData() {
+      const syncStatus = document.getElementById('syncStatus');
+      try {
+        // Fetches data.json from the same directory with cache busting
+        const res = await fetch(`data.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error("Price data file not found");
+        priceData = await res.json();
+        syncStatus.textContent = `Circular loaded (${priceData.length} products available)`;
+        syncStatus.style.color = "#38a169";
+      } catch (err) {
+        syncStatus.textContent = "Please upload circular from Admin panel.";
+        syncStatus.style.color = "#e53e3e";
+      }
     }
+    loadPriceData();
 
-    // Format currency to INR
-    function formatCurrency(val) {
-      if (isNaN(val)) return '₹ 0.00';
-      return '₹ ' + Number(val).toLocaleString('en-IN', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
+    // Auto-complete Search Logic
+    function handleSearchInput() {
+      const input = document.getElementById('productSearch');
+      const clearBtn = document.getElementById('clearBtn');
+      const val = input.value.trim().toLowerCase();
+      const suggestions = document.getElementById('suggestionsBox');
 
-    // Escape HTML to prevent injection
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = String(text);
-      return div.innerHTML;
-    }
+      clearBtn.style.display = val ? 'flex' : 'none';
 
-    // Robust Excel Parser using SheetJS
-    function parseExcelCircular(arrayBuffer) {
-      if (typeof XLSX === 'undefined') {
-        throw new Error("SheetJS engine not ready. Please ensure internet access.");
-      }
-
-      const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true, cellNF: false });
-      if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
-        throw new Error("The uploaded Excel workbook contains no readable sheets.");
-      }
-
-      let activeSheet = null;
-      let sheetName = '';
-      for (const name of workbook.SheetNames) {
-        const ws = workbook.Sheets[name];
-        if (ws && ws['!ref']) {
-          activeSheet = ws;
-          sheetName = name;
-          break;
-        }
-      }
-
-      if (!activeSheet) {
-        activeSheet = workbook.Sheets[workbook.SheetNames[0]];
-        sheetName = workbook.SheetNames[0];
-      }
-
-      const rawRows = XLSX.utils.sheet_to_json(activeSheet, { header: 1, defval: '' });
-      if (!rawRows || rawRows.length === 0) {
-        throw new Error("No data found in sheet: " + sheetName);
-      }
-
-      let headerIndex = -1;
-      let colMap = {
-        name: -1,
-        dlp: 4,    // Default Col E
-        mrp: 5,    // Default Col F
-        hoDisc: 7, // Default Col H
-        effDlp: 8  // Default Col I
-      };
-
-      // Header row detection scanning up to first 25 rows
-      for (let r = 0; r < Math.min(rawRows.length, 25); r++) {
-        const row = rawRows[r];
-        if (!Array.isArray(row)) continue;
-
-        let isHeader = false;
-        row.forEach(cell => {
-          const text = String(cell).trim().toLowerCase();
-          if (text.includes('mrp') || (text.includes('eff') && text.includes('dlp')) || text === 'dlp') {
-            isHeader = true;
-          }
-        });
-
-        if (isHeader) {
-          headerIndex = r;
-          row.forEach((cell, idx) => {
-            const h = String(cell).trim().toLowerCase().replace(/\s+/g, ' ');
-            if (h.includes('product') || h.includes('item') || h.includes('grade') || h.includes('desc') || h.includes('material')) {
-              colMap.name = idx;
-            } else if (h.includes('eff') && h.includes('dlp')) {
-              colMap.effDlp = idx;
-            } else if (h === 'dlp' || h.includes('dealer price') || h.startsWith('dlp')) {
-              colMap.dlp = idx;
-            } else if (h.includes('mrp') || h.includes('max retail')) {
-              colMap.mrp = idx;
-            } else if (h.includes('ho') || h.includes('head office') || h.includes('disc')) {
-              colMap.hoDisc = idx;
-            }
-          });
-          break;
-        }
-      }
-
-      const startRow = headerIndex >= 0 ? headerIndex + 1 : 0;
-      const parsedProducts = [];
-
-      for (let i = startRow; i < rawRows.length; i++) {
-        const row = rawRows[i];
-        if (!Array.isArray(row) || row.length === 0) continue;
-
-        let name = '';
-        if (colMap.name !== -1 && row[colMap.name]) {
-          name = String(row[colMap.name]).trim();
-        } else {
-          const fallbacks = [row[1], row[2], row[0], row[3]];
-          for (let cand of fallbacks) {
-            const strCand = String(cand || '').trim();
-            if (strCand.length > 2 && isNaN(strCand)) {
-              name = strCand;
-              break;
-            }
-          }
-        }
-
-        const dlp = cleanNumber(row[colMap.dlp]);
-        const mrp = cleanNumber(row[colMap.mrp]);
-        const hoDisc = cleanNumber(row[colMap.hoDisc]);
-        let effDlp = cleanNumber(row[colMap.effDlp]);
-
-        if (effDlp === 0 && dlp > 0) {
-          effDlp = Math.max(0, dlp - hoDisc);
-        }
-
-        if (!name || (dlp === 0 && mrp === 0 && effDlp === 0)) {
-          continue;
-        }
-
-        parsedProducts.push({
-          name: name,
-          dlp: dlp,
-          mrp: mrp,
-          hoDisc: hoDisc,
-          effDlp: effDlp
-        });
-      }
-
-      return {
-        sheet: sheetName,
-        total: parsedProducts.length,
-        items: parsedProducts
-      };
-    }
-
-    // Display product details card
-    function showProductCard(product) {
-      if (!product) {
-        document.getElementById('resultContainer').classList.add('hidden');
+      if (!val) {
+        suggestions.style.display = 'none';
         return;
       }
 
-      document.getElementById('resProductName').textContent = product.name;
-      document.getElementById('resEffDlp').textContent = formatCurrency(product.effDlp);
-      document.getElementById('resMrp').textContent = formatCurrency(product.mrp);
-      document.getElementById('resDlp').textContent = formatCurrency(product.dlp);
-      document.getElementById('resHoDisc').textContent = formatCurrency(product.hoDisc);
+      const matches = priceData.filter(item => 
+        item.name && item.name.toLowerCase().includes(val)
+      ).slice(0, 15);
 
-      document.getElementById('resultContainer').classList.remove('hidden');
-      document.getElementById('noMatchCard').classList.add('hidden');
-      lucide.createIcons();
-    }
-
-    // Autocomplete & Search
-    const searchInput = document.getElementById('productSearchInput');
-    const clearBtn = document.getElementById('clearSearchBtn');
-    const dropdown = document.getElementById('suggestionsDropdown');
-
-    function searchProducts(query) {
-      if (!query.trim()) return [];
-      const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
-      return productDatabase.filter(item => {
-        const name = item.name.toLowerCase();
-        return tokens.every(token => name.includes(token));
-      });
-    }
-
-    function renderSuggestions(matches) {
-      dropdown.innerHTML = '';
       if (matches.length === 0) {
-        dropdown.classList.add('hidden');
-        return;
+        suggestions.innerHTML = '<div class="suggestion-item" style="color:#a0aec0;cursor:default;">No products found</div>';
+      } else {
+        suggestions.innerHTML = matches.map(m => 
+          `<div class="suggestion-item" onclick="selectProduct('${encodeURIComponent(JSON.stringify(m))}')">${m.name}</div>`
+        ).join('');
       }
-
-      matches.slice(0, 20).forEach(product => {
-        const li = document.createElement('li');
-        li.className = 'px-4 py-3 hover:bg-orange-50 cursor-pointer flex items-center justify-between text-sm transition';
-        li.innerHTML = `
-          <div class="font-semibold text-slate-800">${escapeHtml(product.name)}</div>
-          <div class="text-xs text-brand-orange font-bold font-mono">
-            Eff DLP: ${formatCurrency(product.effDlp)}
-          </div>
-        `;
-        li.addEventListener('click', () => {
-          searchInput.value = product.name;
-          dropdown.classList.add('hidden');
-          clearBtn.classList.remove('hidden');
-          selectedProduct = product;
-          showProductCard(product);
-        });
-        dropdown.appendChild(li);
-      });
-
-      dropdown.classList.remove('hidden');
+      suggestions.style.display = 'block';
     }
 
-    searchInput.addEventListener('input', (e) => {
-      const val = e.target.value;
-      if (val.length > 0) {
-        clearBtn.classList.remove('hidden');
-      } else {
-        clearBtn.classList.add('hidden');
-      }
+    function clearSearch() {
+      document.getElementById('productSearch').value = '';
+      document.getElementById('clearBtn').style.display = 'none';
+      document.getElementById('suggestionsBox').style.display = 'none';
+      document.getElementById('resultCard').style.display = 'none';
+    }
 
-      if (val.trim().length > 0) {
-        const matches = searchProducts(val);
-        renderSuggestions(matches);
-        if (matches.length === 0) {
-          document.getElementById('resultContainer').classList.add('hidden');
-          document.getElementById('noMatchCard').classList.remove('hidden');
-        } else {
-          document.getElementById('noMatchCard').classList.add('hidden');
-        }
-      } else {
-        dropdown.classList.add('hidden');
-        document.getElementById('resultContainer').classList.add('hidden');
-        document.getElementById('noMatchCard').classList.add('hidden');
-      }
-    });
+    function selectProduct(encodedItem) {
+      const item = JSON.parse(decodeURIComponent(encodedItem));
+      document.getElementById('productSearch').value = item.name;
+      document.getElementById('suggestionsBox').style.display = 'none';
+      document.getElementById('clearBtn').style.display = 'flex';
 
-    // Erase product name in one go
-    clearBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      clearBtn.classList.add('hidden');
-      dropdown.classList.add('hidden');
-      document.getElementById('resultContainer').classList.add('hidden');
-      document.getElementById('noMatchCard').classList.add('hidden');
-      selectedProduct = null;
-      searchInput.focus();
-    });
+      // Show Details
+      document.getElementById('cardProductName').textContent = item.name;
+      document.getElementById('cardEffDlp').textContent = formatCurrency(item.effDlp);
+      document.getElementById('cardMrp').textContent = formatCurrency(item.mrp);
+      document.getElementById('cardDlp').textContent = formatCurrency(item.dlp);
+      document.getElementById('cardHoDisc').textContent = formatCurrency(item.hoDisc);
 
-    document.addEventListener('click', (e) => {
-      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
-    });
+      document.getElementById('resultCard').style.display = 'block';
+    }
 
-    // Admin Passcode & Upload Logic
-    const openAdminBtn = document.getElementById('openAdminModalBtn');
-    const passcodeModal = document.getElementById('passcodeModal');
-    const closePasscodeBtn = document.getElementById('closePasscodeBtn');
-    const cancelPasscodeBtn = document.getElementById('cancelPasscodeBtn');
-    const submitPasscodeBtn = document.getElementById('submitPasscodeBtn');
-    const passcodeInput = document.getElementById('passcodeInput');
-    const passcodeError = document.getElementById('passcodeError');
+    function formatCurrency(val) {
+      const num = parseFloat(val);
+      return isNaN(num) ? "₹0.00" : `₹${num.toFixed(2)}`;
+    }
 
-    const adminUploadModal = document.getElementById('adminUploadModal');
-    const closeUploadModalBtn = document.getElementById('closeUploadModalBtn');
-    const finishUploadBtn = document.getElementById('finishUploadBtn');
-    const resetDemoDataBtn = document.getElementById('resetDemoDataBtn');
-    const xlsxInput = document.getElementById('xlsxCircularInput');
-    const statusBox = document.getElementById('uploadStatusBox');
+    // Modal & Authentication
+    function openAdminModal() {
+      document.getElementById('adminModal').style.display = 'flex';
+      document.getElementById('authSection').style.display = 'block';
+      document.getElementById('uploadSection').style.display = 'none';
+      document.getElementById('passcode').value = '';
+      document.getElementById('ghToken').value = localStorage.getItem('servo_gh_token') || '';
+      document.getElementById('ghRepo').value = localStorage.getItem('servo_gh_repo') || '';
+    }
 
-    openAdminBtn.addEventListener('click', () => {
-      passcodeInput.value = '';
-      passcodeError.classList.add('hidden');
-      passcodeModal.classList.remove('hidden');
-      setTimeout(() => passcodeInput.focus(), 60);
-    });
-
-    closePasscodeBtn.addEventListener('click', () => passcodeModal.classList.add('hidden'));
-    cancelPasscodeBtn.addEventListener('click', () => passcodeModal.classList.add('hidden'));
+    function closeAdminModal() {
+      document.getElementById('adminModal').style.display = 'none';
+    }
 
     function verifyPasscode() {
-      if (passcodeInput.value.trim() === REQUIRED_PASSCODE) {
-        passcodeModal.classList.add('hidden');
-        adminUploadModal.classList.remove('hidden');
-        statusBox.classList.add('hidden');
+      const code = document.getElementById('passcode').value;
+      if (code === '011100') {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('uploadSection').style.display = 'block';
       } else {
-        passcodeError.classList.remove('hidden');
+        alert('Incorrect Passcode');
       }
     }
 
-    submitPasscodeBtn.addEventListener('click', verifyPasscode);
-    passcodeInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') verifyPasscode();
-    });
+    // Process XLSX and Push to GitHub Repository
+    async function processAndPushCircular() {
+      const fileInput = document.getElementById('circularFile');
+      const token = document.getElementById('ghToken').value.trim();
+      const repo = document.getElementById('ghRepo').value.trim();
+      const status = document.getElementById('uploadStatus');
 
-    closeUploadModalBtn.addEventListener('click', () => adminUploadModal.classList.add('hidden'));
-    finishUploadBtn.addEventListener('click', () => adminUploadModal.classList.add('hidden'));
+      if (!fileInput.files.length) {
+        alert('Please choose an Excel file.');
+        return;
+      }
+      if (!token || !repo) {
+        alert('Please enter your GitHub Token and Repo (e.g., username/servo-portal).');
+        return;
+      }
 
-    function updateCounters() {
-      document.getElementById('datasetCountBadge').textContent = `${productDatabase.length} SKUs`;
-      document.getElementById('productCounterSub').textContent = `${productDatabase.length} SKUs loaded`;
-    }
+      // Save for convenience on the admin's device
+      localStorage.setItem('servo_gh_token', token);
+      localStorage.setItem('servo_gh_repo', repo);
 
-    function showStatus(msg, success = true) {
-      statusBox.innerHTML = msg;
-      statusBox.className = success 
-        ? 'p-3.5 rounded-xl text-xs font-medium border bg-emerald-50 border-emerald-300 text-emerald-800' 
-        : 'p-3.5 rounded-xl text-xs font-medium border bg-rose-50 border-rose-300 text-rose-800';
-      statusBox.classList.remove('hidden');
-    }
+      status.style.display = 'block';
+      status.style.color = '#3182ce';
+      status.textContent = 'Parsing Excel sheet...';
 
-    // Handle XLSX File Upload
-    xlsxInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
+      const file = fileInput.files[0];
       const reader = new FileReader();
-      reader.onload = function(evt) {
+
+      reader.onload = async function(e) {
         try {
-          const buffer = evt.target.result;
-          const result = parseExcelCircular(buffer);
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
 
-          if (result.items && result.items.length > 0) {
-            productDatabase = result.items;
-            updateCounters();
-            showStatus(`<strong>Success!</strong> Successfully loaded <strong>${result.total} SKUs</strong> from sheet "${result.sheet}". System calculations updated.`);
+          // Parse mapped columns:
+          // Column E = index 4 (DLP), Column F = index 5 (MRP), Column H = index 7 (HO Disc), Column I = index 8 (Eff DLP)
+          const parsed = [];
+          for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            const name = (r[1] || r[2] || r[0] || "").toString().trim(); // Product description / name
+            const dlp = parseFloat(r[4]) || 0;
+            const mrp = parseFloat(r[5]) || 0;
+            const hoDisc = parseFloat(r[7]) || 0;
+            const effDlp = parseFloat(r[8]) || 0;
 
-            if (selectedProduct) {
-              const updated = productDatabase.find(p => p.name.toLowerCase() === selectedProduct.name.toLowerCase());
-              if (updated) showProductCard(updated);
+            if (name) {
+              parsed.push({ name, dlp, mrp, hoDisc, effDlp });
             }
-          } else {
-            showStatus(`<strong>Parsing Warning:</strong> Processed sheet "${result.sheet}" but could not identify product rows with DLP/MRP. Ensure standard column layout.`, false);
           }
+
+          status.textContent = 'Updating across all devices via GitHub...';
+
+          // Commit to GitHub via API
+          await commitToGitHub(repo, token, parsed);
+
+          status.style.color = '#38a169';
+          status.textContent = 'Successfully synced across all devices!';
+          priceData = parsed;
+          setTimeout(() => closeAdminModal(), 1500);
+
         } catch (err) {
-          showStatus(`<strong>Error:</strong> ${err.message || "Failed to parse Excel circular."}`, false);
+          status.style.color = '#e53e3e';
+          status.textContent = 'Error: ' + err.message;
         }
       };
+
       reader.readAsArrayBuffer(file);
-    });
+    }
 
-    resetDemoDataBtn.addEventListener('click', () => {
-      productDatabase = [...INITIAL_PRODUCTS];
-      updateCounters();
-      showStatus("Loaded default demo circular (7 SKUs).");
-      if (selectedProduct) showProductCard(selectedProduct);
-    });
+    async function commitToGitHub(repo, token, contentObject) {
+      const path = 'data.json';
+      const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+      
+      // Get existing file SHA if it exists
+      let sha = '';
+      try {
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `token ${token}` }
+        });
+        if (getRes.ok) {
+          const fileInfo = await getRes.json();
+          sha = fileInfo.sha;
+        }
+      } catch (e) {}
 
-    // Initialize application on load
-    window.addEventListener('DOMContentLoaded', () => {
-      initializeTopDate();
-      productDatabase = [...INITIAL_PRODUCTS];
-      updateCounters();
-      lucide.createIcons();
-    });
+      // UTF-8 base64 encoding
+      const jsonStr = JSON.stringify(contentObject, null, 2);
+      const encodedContent = btoa(unescape(encodeURIComponent(jsonStr)));
+
+      const body = {
+        message: 'Update price circular via Admin Portal',
+        content: encodedContent
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!putRes.ok) {
+        const errorData = await putRes.json();
+        throw new Error(errorData.message || 'Failed to update GitHub repository.');
+      }
+    }
   </script>
 </body>
 </html>
